@@ -117,14 +117,20 @@ export default function App() {
 
     const id = decodeReceiptId(raw);
 
-    fetch(`${SHEET_API_URL}?action=getReceipt&id=${encodeURIComponent(id)}`)
+    // POST with text/plain avoids CORS preflight (same pattern as POSS api.js)
+    fetch(SHEET_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "getReceipt", data: { id } }),
+    })
       .then(r => r.json())
       .then(json => {
-        if (json && json.receiptData) {
+        const raw = json?.receiptData ?? json?.data?.receiptData;
+        if (raw) {
           try {
-            setData(JSON.parse(json.receiptData));
+            setData(typeof raw === 'string' ? JSON.parse(raw) : raw);
           } catch {
-            setData(decodeReceipt(json.receiptData));
+            setNotFound(true);
           }
         } else {
           setNotFound(true);
