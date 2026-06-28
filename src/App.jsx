@@ -20,9 +20,13 @@ export const decodeReceipt = (str) => {
 };
 
 // Decode token from POSS receipt URL; falls back to raw value for old plain-ID links
-const decodeReceiptId = (token) => {
-  try { return atob(token); } catch (e) { return token; }
+const xorDecode = (token) => {
+  try {
+    const decoded = atob(token);
+    return decoded.split('').map((c,i) => String.fromCharCode(c.charCodeAt(0) ^ (42 + i % 7))).join('');
+  } catch (e) { return token; }
 };
+const decodeReceiptId = xorDecode;
 
 // Copied from POSS/src/App.jsx
 export const ReceiptPage = ({ data }) => {
