@@ -41,7 +41,7 @@ export const ReceiptPage = ({ data }) => {
       </div>
     );
   }
-  const { biz, items, total, method, tech, receiptNo, date, pointsEarned, pointDiscount, phone } = data;
+  const { biz, items, total, method, tech, receiptNo, date, pointsEarned, pointDiscount, phone, issue } = data;
   return (
     <div id="kawasan-resit" style={{ minHeight: "100dvh", background: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", padding: "28px 22px 100px", maxWidth: 480, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22, paddingBottom: 16, borderBottom: "1px dashed #E5E5EA" }}>
@@ -59,6 +59,7 @@ export const ReceiptPage = ({ data }) => {
         {tech ? <div style={{ display: "flex", gap: 8 }}><span style={{ width: 80, textAlign: "right", color: "#666" }}>By:</span><span style={{ fontWeight: 600 }}>{tech}</span></div> : null}
       </div>
       {phone ? <div style={{ fontSize: 11, textAlign: "left", marginBottom: 14 }}><span style={{ color: "#666" }}>To : </span><span style={{ fontWeight: 600 }}>{phone}</span></div> : null}
+      {issue ? <div style={{ fontSize: 11, textAlign: "left", marginBottom: 14 }}><span style={{ color: "#666" }}>Issue : </span><span style={{ fontWeight: 600 }}>{issue}</span></div> : null}
       <table style={{ width: "100%", fontSize: 14, borderCollapse: "collapse", tableLayout: "fixed" }}>
         <colgroup><col style={{ width: "64%" }} /><col style={{ width: "14%" }} /><col style={{ width: "22%" }} /></colgroup>
         <thead>
