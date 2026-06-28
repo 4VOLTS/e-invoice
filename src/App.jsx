@@ -3,7 +3,16 @@ import { useState, useEffect } from 'react'
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwt0ezhFZRU9K8oiWjNmhtqYeT8g0mB3FW8aq_1RZ2S2_-xoPKKN52PCYUCiAkaQQIdDQ/exec";
 const REDIRECT_URL = "https://4volts.my.canva.site";
 
-const decodeReceipt = (str) => {
+// Copied from POSS/src/App.jsx
+export const encodeReceipt = (data) => {
+  try {
+    const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  } catch (e) { return ""; }
+};
+
+// Copied from POSS/src/App.jsx
+export const decodeReceipt = (str) => {
   try {
     let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
     return JSON.parse(decodeURIComponent(escape(atob(base64))));
@@ -16,12 +25,12 @@ const decodeReceiptId = (token) => {
     const b64 = token.replace(/-/g, '+').replace(/_/g, '/');
     const decoded = atob(b64);
     if (decoded.startsWith('4vr_')) return decoded.slice(4);
-  } catch(e) {}
+  } catch (e) {}
   return token;
 };
 
 // Copied from POSS/src/App.jsx
-const ReceiptPage = ({ data }) => {
+export const ReceiptPage = ({ data }) => {
   if (!data) {
     return (
       <div id="kawasan-resit" style={{ minHeight: "auto", background: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", padding: "40px", maxWidth: 800, margin: "0 auto", color: "#000" }}>
@@ -117,7 +126,7 @@ export default function App() {
 
     const id = decodeReceiptId(raw);
 
-    // POST with text/plain avoids CORS preflight (same pattern as POSS api.js)
+    // POST with text/plain avoids CORS preflight — same pattern as POSS api.js
     fetch(SHEET_API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -125,13 +134,10 @@ export default function App() {
     })
       .then(r => r.json())
       .then(json => {
-        const raw = json?.receiptData ?? json?.data?.receiptData;
-        if (raw) {
-          try {
-            setData(typeof raw === 'string' ? JSON.parse(raw) : raw);
-          } catch {
-            setNotFound(true);
-          }
+        const receiptData = json?.receiptData ?? json?.data?.receiptData;
+        if (receiptData) {
+          const parsed = typeof receiptData === 'string' ? JSON.parse(receiptData) : receiptData;
+          setData(parsed);
         } else {
           setNotFound(true);
         }
@@ -142,15 +148,11 @@ export default function App() {
 
   if (loading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", color: "#8E8E93", fontSize: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", color: "#8E8E93", fontSize: 14, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
         Loading receipt...
       </div>
     );
   }
 
-  if (notFound) {
-    return <ReceiptPage data={null} />;
-  }
-
-  return <ReceiptPage data={data} />;
+  return <ReceiptPage data={notFound ? null : data} />;
 }
