@@ -129,7 +129,7 @@ export default function App() {
     fetch(SHEET_API_URL + "?action=getReceipt&id=" + encodeURIComponent(id))
       .then(r => r.json())
       .then(json => {
-        const receiptData = json?.receiptData ?? json?.data?.receiptData;
+        const receiptData = json?.receiptData ?? json?.data?.receiptData ?? json?.data;
         if (receiptData) {
           const parsed = typeof receiptData === 'string' ? JSON.parse(receiptData) : receiptData;
           setData(parsed);
