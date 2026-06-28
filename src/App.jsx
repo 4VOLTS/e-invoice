@@ -3,12 +3,21 @@ import { useState, useEffect } from 'react'
 const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwt0ezhFZRU9K8oiWjNmhtqYeT8g0mB3FW8aq_1RZ2S2_-xoPKKN52PCYUCiAkaQQIdDQ/exec";
 const REDIRECT_URL = "https://4volts.my.canva.site";
 
-// Copied from POSS/src/App.jsx
 const decodeReceipt = (str) => {
   try {
     let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
     return JSON.parse(decodeURIComponent(escape(atob(base64))));
   } catch (e) { return null; }
+};
+
+// Decode token from POSS receipt URL; falls back to raw value for old plain-ID links
+const decodeReceiptId = (token) => {
+  try {
+    const b64 = token.replace(/-/g, '+').replace(/_/g, '/');
+    const decoded = atob(b64);
+    if (decoded.startsWith('4vr_')) return decoded.slice(4);
+  } catch(e) {}
+  return token;
 };
 
 // Copied from POSS/src/App.jsx
@@ -99,12 +108,14 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    const raw = params.get('id');
 
-    if (!id) {
+    if (!raw) {
       window.location.replace(REDIRECT_URL);
       return;
     }
+
+    const id = decodeReceiptId(raw);
 
     fetch(`${SHEET_API_URL}?action=getReceipt&id=${encodeURIComponent(id)}`)
       .then(r => r.json())
