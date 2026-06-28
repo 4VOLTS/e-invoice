@@ -22,9 +22,9 @@ export const decodeReceipt = (str) => {
 // Decode token from POSS receipt URL; falls back to raw value for old plain-ID links
 const decodeReceiptId = (token) => {
   try {
-    const b64 = token.replace(/-/g, '+').replace(/_/g, '/');
-    const decoded = atob(b64);
+    const decoded = atob(token);
     if (decoded.startsWith('4vr_')) return decoded.slice(4);
+    return decoded;
   } catch (e) {}
   return token;
 };
