@@ -21,12 +21,7 @@ export const decodeReceipt = (str) => {
 
 // Decode token from POSS receipt URL; falls back to raw value for old plain-ID links
 const decodeReceiptId = (token) => {
-  try {
-    const decoded = atob(token);
-    if (decoded.startsWith('4vr_')) return decoded.slice(4);
-    return decoded;
-  } catch (e) {}
-  return token;
+  try { return atob(token); } catch (e) { return token; }
 };
 
 // Copied from POSS/src/App.jsx
