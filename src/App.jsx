@@ -42,6 +42,7 @@ export const ReceiptPage = ({ data }) => {
     );
   }
   const { biz, items, total, method, tech, receiptNo, date, pointsEarned, pointDiscount, phone, issue } = data;
+  const warrantyDescs = [...new Set(items.map(it => it.supplierDesc).filter(Boolean))];
   return (
     <div id="kawasan-resit" style={{ minHeight: "100dvh", background: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", padding: "28px 22px 100px", maxWidth: 480, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22, paddingBottom: 16, borderBottom: "1px dashed #E5E5EA" }}>
@@ -75,7 +76,6 @@ export const ReceiptPage = ({ data }) => {
               <td style={{ padding: "13px 0", verticalAlign: "top" }}>
                 {it.name}
                 {it.warranty && it.warranty !== "Tiada Waranti" ? <div style={{ fontSize: 12, color: "#777" }}>Waranti : {it.warranty}</div> : null}
-                {it.supplierDesc ? <div style={{ fontSize: 11, color: "#999" }}>{it.supplierDesc}</div> : null}
                 {it.remark ? <div style={{ fontSize: 12, color: "#777", fontStyle: "italic" }}>{it.remark}</div> : null}
               </td>
               <td style={{ textAlign: "center", padding: "13px 0", verticalAlign: "top" }}>{it.qty}</td>
@@ -93,9 +93,15 @@ export const ReceiptPage = ({ data }) => {
       <p style={{ textAlign: "center", marginTop: 28, fontSize: 15 }}>Thank you for your business.</p>
       <div style={{ marginTop: 18, textAlign: "left", fontSize: 8, color: "#444", lineHeight: 1.5, background: "#F2F2F7", padding: "12px 14px", borderRadius: 8 }}>
         <strong style={{ color: "#1C1C1E" }}>WARRANTY CLAIM</strong>
-        <div style={{ marginTop: 4 }}>1. Warranty only covers manufacturing defect or hardware failure</div>
-        <div>2. Warranty does not cover damage caused by drop, wet, crack, or visible defect</div>
-        <div>3. Goods and services sold are not refundable</div>
+        {warrantyDescs.length > 0 ? (
+          warrantyDescs.map((desc, i) => <div key={i} style={{ marginTop: i === 0 ? 4 : 2 }}>• {desc}</div>)
+        ) : (
+          <>
+            <div style={{ marginTop: 4 }}>1. Warranty only covers manufacturing defect or hardware failure</div>
+            <div>2. Warranty does not cover damage caused by drop, wet, crack, or visible defect</div>
+            <div>3. Goods and services sold are not refundable</div>
+          </>
+        )}
       </div>
       <p style={{ textAlign: "center", marginTop: 18, fontSize: 12.5, fontWeight: 600 }}>REVIEW US ON GOOGLE</p>
       <div style={{ textAlign: "center", marginTop: 26 }}>
