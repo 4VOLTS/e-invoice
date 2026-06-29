@@ -75,6 +75,7 @@ export const ReceiptPage = ({ data }) => {
               <td style={{ padding: "13px 0", verticalAlign: "top" }}>
                 {it.name}
                 {it.warranty && it.warranty !== "Tiada Waranti" ? <div style={{ fontSize: 12, color: "#777" }}>Waranti : {it.warranty}</div> : null}
+                {it.supplierDesc ? <div style={{ fontSize: 11, color: "#999" }}>{it.supplierDesc}</div> : null}
                 {it.remark ? <div style={{ fontSize: 12, color: "#777", fontStyle: "italic" }}>{it.remark}</div> : null}
               </td>
               <td style={{ textAlign: "center", padding: "13px 0", verticalAlign: "top" }}>{it.qty}</td>
