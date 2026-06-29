@@ -103,7 +103,7 @@ export const ReceiptPage = ({ data }) => {
           </>
         )}
       </div>
-      <p style={{ textAlign: "center", marginTop: 18, fontSize: 12.5, fontWeight: 600 }}>REVIEW US ON GOOGLE</p>
+      <p style={{ textAlign: "center", marginTop: 18 }}><a href="https://g.page/r/CZsy48G5EhoIEBM/review" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "#1C1C1E", fontWeight: 600, fontSize: 12.5 }}>REVIEW US ON GOOGLE</a></p>
       <div style={{ textAlign: "center", marginTop: 26 }}>
         <span style={{ fontSize: 12, color: "#999" }}>Powered by </span>
         <img src="/logo.png" alt="4VOLTS" style={{ height: 18, verticalAlign: "middle", objectFit: "contain" }} />
