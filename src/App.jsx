@@ -94,7 +94,7 @@ export const ReceiptPage = ({ data }) => {
       <div style={{ marginTop: 18, textAlign: "left", fontSize: 8, color: "#444", lineHeight: 1.5, background: "#F2F2F7", padding: "12px 14px", borderRadius: 8 }}>
         <strong style={{ color: "#1C1C1E" }}>WARRANTY CLAIM</strong>
         {warrantyDescs.length > 0 ? (
-          warrantyDescs.map((desc, i) => <div key={i} style={{ marginTop: i === 0 ? 4 : 2 }}>• {desc}</div>)
+          warrantyDescs.map((desc, i) => <div key={i} style={{ marginTop: i === 0 ? 4 : 2, whiteSpace: "pre-line" }}>• {desc}</div>)
         ) : (
           <>
             <div style={{ marginTop: 4 }}>1. Warranty only covers manufacturing defect or hardware failure</div>
