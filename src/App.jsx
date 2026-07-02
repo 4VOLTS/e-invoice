@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwt0ezhFZRU9K8oiWjNmhtqYeT8g0mB3FW8aq_1RZ2S2_-xoPKKN52PCYUCiAkaQQIdDQ/exec";
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzHHIgKxjtDz2ns6RFfaLAiKFvKm2YbAUUPrJhyeCSbAnKG4rrokc4Qd9uJ0dNZlrxexg/exec";
 const REDIRECT_URL = "https://4volts.my.canva.site";
 
 // Copied from POSS/src/App.jsx
