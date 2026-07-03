@@ -43,6 +43,10 @@ export const ReceiptPage = ({ data }) => {
   }
   const { biz, items, total, method, tech, receiptNo, date, pointsEarned, pointDiscount, phone, issue } = data;
   const warrantyDescs = [...new Set(items.map(it => it.supplierDesc).filter(Boolean))];
+  // Box WARRANTY CLAIM hanya relevan kalau ada item yang betul-betul
+  // berwaranti (bukan "No Warranty") atau ada terma supplier. Kalau tidak,
+  // jangan papar terma default — mengelirukan customer yang beli tanpa waranti.
+  const hasWarranty = items.some(it => it.warranty && it.warranty !== "No Warranty");
   return (
     <div id="kawasan-resit" style={{ minHeight: "100dvh", background: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", padding: "28px 22px 100px", maxWidth: 480, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22, paddingBottom: 16, borderBottom: "1px dashed #E5E5EA" }}>
@@ -75,7 +79,7 @@ export const ReceiptPage = ({ data }) => {
             <tr key={i} style={{ borderBottom: i === items.length - 1 ? "2px solid #1C1C1E" : "none" }}>
               <td style={{ padding: "13px 0", verticalAlign: "top" }}>
                 {it.name}
-                {it.warranty && it.warranty !== "Tiada Waranti" ? <div style={{ fontSize: 12, color: "#777" }}>Waranti : {it.warranty}</div> : null}
+                {it.warranty && it.warranty !== "No Warranty" ? <div style={{ fontSize: 12, color: "#777" }}>Warranty : {it.warranty}</div> : null}
                 {it.remark ? <div style={{ fontSize: 12, color: "#777", fontStyle: "italic" }}>{it.remark}</div> : null}
               </td>
               <td style={{ textAlign: "center", padding: "13px 0", verticalAlign: "top" }}>{it.qty}</td>
@@ -91,18 +95,20 @@ export const ReceiptPage = ({ data }) => {
         {pointsEarned > 0 ? <div style={{ display: "flex", justifyContent: "space-between", color: "#FF2D55", marginTop: 2 }}><span>Points Earned :</span><span>+{pointsEarned}</span></div> : null}
       </div>
       <p style={{ textAlign: "center", marginTop: 28, fontSize: 15 }}>Thank you for your business.</p>
-      <div style={{ marginTop: 18, textAlign: "left", fontSize: 8, color: "#444", lineHeight: 1.5, background: "#F2F2F7", padding: "12px 14px", borderRadius: 8 }}>
-        <strong style={{ color: "#1C1C1E" }}>WARRANTY CLAIM</strong>
-        {warrantyDescs.length > 0 ? (
-          warrantyDescs.map((desc, i) => <div key={i} style={{ marginTop: i === 0 ? 4 : 2, whiteSpace: "pre-line" }}>• {desc}</div>)
-        ) : (
-          <>
-            <div style={{ marginTop: 4 }}>1. Warranty only covers manufacturing defect or hardware failure</div>
-            <div>2. Warranty does not cover damage caused by drop, wet, crack, or visible defect</div>
-            <div>3. Goods and services sold are not refundable</div>
-          </>
-        )}
-      </div>
+      {(warrantyDescs.length > 0 || hasWarranty) && (
+        <div style={{ marginTop: 18, textAlign: "left", fontSize: 8, color: "#444", lineHeight: 1.5, background: "#F2F2F7", padding: "12px 14px", borderRadius: 8 }}>
+          <strong style={{ color: "#1C1C1E" }}>WARRANTY CLAIM</strong>
+          {warrantyDescs.length > 0 ? (
+            warrantyDescs.map((desc, i) => <div key={i} style={{ marginTop: i === 0 ? 4 : 2, whiteSpace: "pre-line" }}>• {desc}</div>)
+          ) : (
+            <>
+              <div style={{ marginTop: 4 }}>1. Warranty only covers manufacturing defect or hardware failure</div>
+              <div>2. Warranty does not cover damage caused by drop, wet, crack, or visible defect</div>
+              <div>3. Goods and services sold are not refundable</div>
+            </>
+          )}
+        </div>
+      )}
       <p style={{ textAlign: "center", marginTop: 18 }}><a href="https://g.page/r/CZsy48G5EhoIEBM/review" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", color: "#1C1C1E", fontWeight: 600, fontSize: 12.5 }}>REVIEW US ON GOOGLE</a></p>
       <div style={{ textAlign: "center", marginTop: 26 }}>
         <span style={{ fontSize: 12, color: "#999" }}>Powered by </span>
