@@ -123,10 +123,27 @@ export const ReceiptPage = ({ data }) => {
   );
 };
 
+const FETCH_TIMEOUT_MS = 30000;
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAY_MS = [2000, 5000];
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// Apps Script pulangkan HALAMAN HTML (bukan JSON) bila dia kena throttle
+// atau terlebih beban - app POS kongsi backend yang sama. Dulu keadaan
+// sementara ni jatuh ke .catch yang sama dengan resit yang betul-betul
+// tiada, jadi customer nampak "pautan telah tamat tempoh" sedangkan link
+// resit tak pernah expire. Bezakan dua-dua supaya mesej tak menipu.
+const fetchReceiptOnce = async (id, signal) => {
+  const res = await fetch(SHEET_API_URL + "?action=getReceipt&id=" + encodeURIComponent(id), { signal });
+  const text = await res.text();
+  if (!res.ok || text.trimStart().startsWith("<")) throw new Error("server-busy");
+  return JSON.parse(text);
+};
+
 export default function App() {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  const [status, setStatus] = useState("loading"); // loading | ok | notfound | busy
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -138,23 +155,46 @@ export default function App() {
     }
 
     const id = decodeReceiptId(raw);
+    let cancelled = false;
 
-    fetch(SHEET_API_URL + "?action=getReceipt&id=" + encodeURIComponent(id))
-      .then(r => r.json())
-      .then(json => {
-        const receiptData = json?.receiptData ?? json?.data?.receiptData ?? json?.data;
-        if (receiptData) {
-          const parsed = typeof receiptData === 'string' ? JSON.parse(receiptData) : receiptData;
-          setData(parsed);
-        } else {
-          setNotFound(true);
+    (async () => {
+      setStatus("loading");
+      for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        if (cancelled) return;
+        if (i > 0) {
+          // Backoff sebelum cuba lagi - tembak semula serta-merta pada
+          // backend yang sedang tersumbat cuma tambah beban.
+          await sleep(RETRY_DELAY_MS[i - 1] ?? 5000);
+          if (cancelled) return;
         }
-      })
-      .catch(() => setNotFound(true))
-      .finally(() => setLoading(false));
+
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
+        try {
+          const json = await fetchReceiptOnce(id, ctrl.signal);
+          if (cancelled) return;
+          const receiptData = json?.receiptData ?? json?.data?.receiptData ?? json?.data;
+          if (receiptData) {
+            setData(typeof receiptData === 'string' ? JSON.parse(receiptData) : receiptData);
+            setStatus("ok");
+          } else {
+            // Server jawab elok - resit ni memang tiada. Muktamad, jangan retry.
+            setStatus("notfound");
+          }
+          return;
+        } catch (e) {
+          // Sibuk / timeout / network - jatuh ke cubaan seterusnya.
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      if (!cancelled) setStatus("busy");
+    })();
+
+    return () => { cancelled = true; };
   }, []);
 
-  if (loading) {
+  if (status === "loading") {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", color: "#8E8E93", fontSize: 14, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
         Loading receipt...
@@ -162,5 +202,16 @@ export default function App() {
     );
   }
 
-  return <ReceiptPage data={notFound ? null : data} />;
+  // Backend sesak / timeout selepas semua cubaan. Berasingan dari "notfound"
+  // supaya customer tak diberitahu link dia tamat tempoh (link tak pernah
+  // expire) sedangkan masalahnya sementara sahaja.
+  if (status === "busy") {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", color: "#8E8E93", fontSize: 14, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+        Server peak, Please Retry
+      </div>
+    );
+  }
+
+  return <ReceiptPage data={status === "notfound" ? null : data} />;
 }
