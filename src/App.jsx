@@ -169,7 +169,12 @@ export const ReceiptPage = ({ data }) => {
         <div style={{ marginTop: 18, textAlign: "left", fontSize: 8, color: "#444", lineHeight: 1.5, background: "#F2F2F7", padding: "12px 14px", borderRadius: 8 }}>
           <strong style={{ color: "#1C1C1E" }}>WARRANTY CLAIM</strong>
           {warrantyDescs.length > 0 ? (
-            warrantyDescs.map((desc, i) => <div key={i} style={{ marginTop: i === 0 ? 4 : 2, whiteSpace: "pre-line" }}>• {desc}</div>)
+            // TIADA bulet. Terma supplier disimpan sebagai teks BERBILANG BARIS
+            // yang sudah bernombor sendiri (1) 2) 3)), jadi satu bulet di depan
+            // blok hanya melekat pada baris PERTAMA — customer nampak
+            // "• 1) Items listed..." sedangkan baris 2 dan 3 kosong di depan.
+            // Blok terma lalai di bawah pun tak berbulet. (16/8/2026)
+            warrantyDescs.map((desc, i) => <div key={i} style={{ marginTop: i === 0 ? 4 : 2, whiteSpace: "pre-line" }}>{desc}</div>)
           ) : (
             <>
               <div style={{ marginTop: 4 }}>1. Warranty only covers manufacturing defect or hardware failure</div>
