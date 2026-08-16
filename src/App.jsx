@@ -116,10 +116,13 @@ export const ReceiptPage = ({ data }) => {
     <div id="kawasan-resit" style={{ minHeight: "100dvh", background: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", padding: "28px 22px 100px", maxWidth: 480, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 22, paddingBottom: 16, borderBottom: "1px dashed #E5E5EA" }}>
         <div style={{ textAlign: "left", flex: 1, paddingRight: 10 }}>
-          <div style={{ fontWeight: 800, fontSize: 8 }}>{biz.name}</div>
-          {biz.regNo ? <div style={{ fontSize: 8, color: "#444", marginTop: 4 }}>{biz.regNo}</div> : null}
-          {biz.address ? <div style={{ fontSize: 8, color: "#444", marginTop: 2, whiteSpace: "pre-line" }}>{biz.address}</div> : null}
-          {biz.phone ? <div style={{ fontSize: 8, color: "#444", marginTop: 6 }}>Tel / WhatsApp :<br /><span style={{ textDecoration: "underline" }}>{biz.phone}</span></div> : null}
+          {/* Hierarki header: nama kedai paling besar, butiran di bawahnya kecil
+              tapi masih terbaca. Dulu SEMUA 8px - lebih kecil daripada
+              description item (12px), jadi resit nampak terbalik. */}
+          <div style={{ fontWeight: 800, fontSize: 14 }}>{biz.name}</div>
+          {biz.regNo ? <div style={{ fontSize: 9, color: "#444", marginTop: 4 }}>{biz.regNo}</div> : null}
+          {biz.address ? <div style={{ fontSize: 9, color: "#444", marginTop: 2, whiteSpace: "pre-line" }}>{biz.address}</div> : null}
+          {biz.phone ? <div style={{ fontSize: 9, color: "#444", marginTop: 6 }}>Tel / WhatsApp :<br /><span style={{ textDecoration: "underline" }}>{biz.phone}</span></div> : null}
         </div>
         <div style={{ textAlign: "right" }}><img src={biz.logo || SHOP_LOGO} alt="logo" style={{ maxHeight: 75, maxWidth: 120, objectFit: "contain" }} /></div>
       </div>
@@ -144,8 +147,10 @@ export const ReceiptPage = ({ data }) => {
             <tr key={i} style={{ borderBottom: i === items.length - 1 ? "2px solid #1C1C1E" : "none" }}>
               <td style={{ padding: "13px 0", verticalAlign: "top" }}>
                 {it.name}
-                {it.warranty && it.warranty !== "No Warranty" ? <div style={{ fontSize: 12, color: "#777" }}>Warranty : {it.warranty}</div> : null}
-                {it.remark ? <div style={{ fontSize: 12, color: "#777", fontStyle: "italic" }}>{it.remark}</div> : null}
+                {/* Baris sokongan di bawah nama item - mesti lebih kecil
+                    daripada nama item (14px), bukan hampir sama. */}
+                {it.warranty && it.warranty !== "No Warranty" ? <div style={{ fontSize: 9.5, color: "#777" }}>Warranty : {it.warranty}</div> : null}
+                {it.remark ? <div style={{ fontSize: 9.5, color: "#777", fontStyle: "italic" }}>{it.remark}</div> : null}
               </td>
               <td style={{ textAlign: "center", padding: "13px 0", verticalAlign: "top" }}>{it.qty}</td>
               <td style={{ textAlign: "right", padding: "13px 0", verticalAlign: "top", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{(it.price * it.qty).toFixed(2)}</td>
