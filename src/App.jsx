@@ -150,7 +150,12 @@ export const ReceiptPage = ({ data }) => {
                 {/* Baris sokongan di bawah nama item - mesti lebih kecil
                     daripada nama item (14px), bukan hampir sama. */}
                 {it.warranty && it.warranty !== "No Warranty" ? <div style={{ fontSize: 9.5, color: "#777" }}>Warranty : {it.warranty}</div> : null}
-                {it.remark ? <div style={{ fontSize: 9.5, color: "#777", fontStyle: "italic" }}>{it.remark}</div> : null}
+                {/* pre-line WAJIB: staff memang taip Description berbilang
+                    baris untuk perkara berbeza (cth. 4V2608103, 17/8/2026 —
+                    "Left & Right hinge repair" + "Note: advise to replace new
+                    hinge"). Tanpa ini HTML runtuhkan baris baru jadi satu
+                    perenggan bersambung. */}
+                {it.remark ? <div style={{ fontSize: 9.5, color: "#777", fontStyle: "italic", whiteSpace: "pre-line" }}>{it.remark}</div> : null}
               </td>
               <td style={{ textAlign: "center", padding: "13px 0", verticalAlign: "top" }}>{it.qty}</td>
               <td style={{ textAlign: "right", padding: "13px 0", verticalAlign: "top", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>{(it.price * it.qty).toFixed(2)}</td>
@@ -165,7 +170,12 @@ export const ReceiptPage = ({ data }) => {
         {pointsEarned > 0 ? <div style={{ display: "flex", justifyContent: "space-between", color: "#FF2D55", marginTop: 2 }}><span>Points Earned :</span><span>+{pointsEarned}</span></div> : null}
       </div>
       <p style={{ textAlign: "center", marginTop: 28, fontSize: 15 }}>Thank you for your business.</p>
-      {(warrantyDescs.length > 0 || hasWarranty) && (
+      {/* SATU syarat sahaja: ada item betul-betul berwaranti. Dulu syaratnya
+          `warrantyDescs.length > 0 || hasWarranty` — jadi kotak tetap muncul
+          bila SEMUA item "No Warranty" asalkan ada item bawa terma supplier,
+          iaitu kes yang fix 3/7 sepatutnya elak. Terma supplier hanya tentukan
+          teks APA dalam kotak, bukan sama ada kotak muncul. (18/8/2026) */}
+      {hasWarranty && (
         <div style={{ marginTop: 18, textAlign: "left", fontSize: 8, color: "#444", lineHeight: 1.5, background: "#F2F2F7", padding: "12px 14px", borderRadius: 8 }}>
           <strong style={{ color: "#1C1C1E" }}>WARRANTY CLAIM</strong>
           {warrantyDescs.length > 0 ? (
